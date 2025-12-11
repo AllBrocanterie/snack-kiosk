@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Snack Kiosk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Snack Bar</h1>
+      <div id="step-indicator">Étape 1/4 : Accueil</div>
+    </header>
+
+    <!-- Écran d'accueil -->
+    <section id="screen-home" class="screen active">
+      <h2>Bienvenue</h2>
+      <button class="btn-primary" id="btn-start-order">Commander</button>
+    </section>
+
+    <!-- Écran catégories -->
+    <section id="screen-categories" class="screen">
+      <h2>Choisissez une catégorie</h2>
+      <div id="categories-container" class="grid"></div>
+      <button class="btn-secondary" id="btn-back-home">Retour</button>
+    </section>
+
+    <!-- Écran produits -->
+    <section id="screen-products" class="screen">
+      <h2 id="products-title">Produits</h2>
+      <div id="products-container" class="grid"></div>
+      <button class="btn-secondary" id="btn-back-categories">Retour</button>
+      <button class="btn-primary" id="btn-go-cart">Voir le panier</button>
+    </section>
+
+    <!-- Écran panier + créneau + paiement -->
+    <section id="screen-cart" class="screen">
+      <h2>Panier</h2>
+      <div id="cart-items"></div>
+      <div class="cart-summary">
+        <p>Total : <span id="cart-total">0.00 €</span></p>
+      </div>
+
+      <h3>Choix du paiement</h3>
+      <label><input type="radio" name="payment-method" value="counter" checked /> Paiement au comptoir</label>
+      <label><input type="radio" name="payment-method" value="online" /> Paiement en ligne</label>
+
+      <h3>Choix du créneau</h3>
+      <select id="slot-select"></select>
+
+      <button class="btn-secondary" id="btn-back-products">Retour</button>
+      <button class="btn-primary" id="btn-checkout">Valider la commande</button>
+    </section>
+
+    <!-- Écran connexion par téléphone -->
+    <section id="screen-auth" class="screen">
+      <h2>Connexion avec votre téléphone</h2>
+      <div class="auth-block">
+        <input id="auth-name" type="text" placeholder="Votre nom (facultatif)" />
+        <input id="auth-phone" type="tel" placeholder="Votre téléphone" />
+        <button class="btn-primary" id="btn-send-code">Recevoir un code</button>
+      </div>
+
+      <div class="auth-block">
+        <input id="auth-code" type="text" placeholder="Code reçu" />
+        <button class="btn-primary" id="btn-verify-code">Valider le code</button>
+      </div>
+
+      <button class="btn-secondary" id="btn-back-cart">Retour au panier</button>
+    </section>
+
+    <!-- Écran confirmation -->
+    <section id="screen-confirmation" class="screen">
+      <h2>Merci !</h2>
+      <p>Votre commande a été enregistrée.</p>
+      <p>Numéro de commande : <strong id="order-number"></strong></p>
+      <p>Créneau : <span id="order-slot"></span></p>
+      <button class="btn-primary" id="btn-new-order">Nouvelle commande</button>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
