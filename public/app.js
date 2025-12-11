@@ -14,6 +14,22 @@ const screens = {
 };
 
 const stepIndicator = document.getElementById('step-indicator');
+// Charger la config (nom du snack)
+async function loadConfig() {
+  try {
+    const res = await fetch('/api/config');
+    const data = await res.json();
+    const headerTitle = document.querySelector('.app-header h1');
+    if (headerTitle && data.snackName) {
+      headerTitle.textContent = data.snackName;
+    }
+  } catch (e) {
+    console.error('Erreur config', e);
+  }
+}
+
+// Appeler loadConfig au démarrage
+loadConfig();
 
 // ==== FONCTION POUR CHANGER D'ÉCRAN ====
 function showScreen(name, stepText) {
