@@ -466,6 +466,11 @@ app.post('/api/admin/orders/:id/status', adminAuth, (req, res) => {
 app.get('/healthz', (req, res) => {
   res.send('OK');
 });
+app.get('/api/config', (req, res) => {
+  res.json({
+    snackName: process.env.SNACK_NAME || 'Snack Bar'
+  });
+});
 // ==== 13. LANCER LE SERVEUR ====
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur http://localhost:${PORT}`);
