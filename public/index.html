@@ -9,9 +9,12 @@
 <body>
   <div class="app">
     <header class="app-header">
-      <h1>Snack Bar</h1>
-      <div id="step-indicator">Étape 1/4 : Accueil</div>
-    </header>
+  <div class="app-header-top">
+    <h1>Snack Tacos</h1>
+    <span class="brand-tagline">Tacos, bowls, wraps & plus</span>
+  </div>
+  <div id="step-indicator">Étape 1/4 : Accueil</div>
+</header>
 
     <!-- Écran d'accueil -->
     <section id="screen-home" class="screen active">
@@ -68,6 +71,40 @@
       </div>
 
       <button class="btn-secondary" id="btn-back-cart">Retour au panier</button>
+    </section>
+
+    <!-- Écran composition tacos -->
+    <section id="screen-composer" class="screen">
+      <h2>Compose ton tacos</h2>
+
+      <p id="composer-base-name"></p>
+      <p id="composer-base-price"></p>
+
+      <div class="composer-group">
+        <h3>Viandes</h3>
+        <p class="composer-help" id="composer-meats-help"></p>
+        <div id="composer-meats" class="composer-options"></div>
+      </div>
+
+      <div class="composer-group">
+        <h3>Sauces</h3>
+        <p class="composer-help">Choisis 1 ou 2 sauces.</p>
+        <div id="composer-sauces" class="composer-options"></div>
+      </div>
+
+      <div class="composer-group">
+        <h3>Suppléments</h3>
+        <p class="composer-help">+0,50€ ou +0,70€ par supplément.</p>
+        <div id="composer-extras" class="composer-options"></div>
+      </div>
+
+      <div class="cart-summary">
+        <span>Total tacos :</span>
+        <span id="composer-total"></span>
+      </div>
+
+      <button class="btn-secondary" id="btn-composer-cancel">Annuler</button>
+      <button class="btn-primary" id="btn-composer-add">Ajouter au panier</button>
     </section>
 
     <!-- Écran confirmation -->

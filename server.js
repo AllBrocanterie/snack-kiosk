@@ -92,12 +92,55 @@ db.serialize(() => {
     )
   `);
 
-  // --- INSÉRER QUELQUES PRODUITS DE TEST (une seule fois) ---
+  // --- INSÉRER UN MENU TYPE TACOS/BOL/WRAP (une seule fois) ---
   db.run(`
     INSERT OR IGNORE INTO menu_items (id, name, description, price_cents, category) VALUES
-    (1, 'Coca-Cola 33cl', 'Boisson gazeuse', 250, 'Boissons'),
-    (2, 'Sandwich Jambon', 'Jambon, beurre', 450, 'Sandwichs'),
-    (3, 'Brownie', 'Gâteau chocolat', 300, 'Desserts')
+    -- Menus Tacos Classiques
+    (1, 'Menu Tacos Classique Simple', '1 viande, frites, boisson 33cl', 1290, 'Menus Tacos Classiques'),
+    (2, 'Menu Tacos Classique Double', '2 viandes, frites, boisson 33cl', 1490, 'Menus Tacos Classiques'),
+    (3, 'Menu Tacos Classique Maxi', '3 viandes, frites, boisson 33cl', 1790, 'Menus Tacos Classiques'),
+
+    -- Menus Tacos Gratinés
+    (4, 'Menu Tacos Gratiné Simple', '1 viande, gratiné, frites, boisson 33cl', 1390, 'Menus Tacos Gratinés'),
+    (5, 'Menu Tacos Gratiné Double', '2 viandes, gratiné, frites, boisson 33cl', 1590, 'Menus Tacos Gratinés'),
+    (6, 'Menu Tacos Gratiné Maxi', '3 viandes, gratiné, frites, boisson 33cl', 1890, 'Menus Tacos Gratinés'),
+
+    -- Menus Tacos Signature (gros best-of)
+    (7, 'Menu Tacos Signature S', 'Recette signature taille S, frites, boisson', 1490, 'Menus Tacos Signature'),
+    (8, 'Menu Tacos Signature M', 'Recette signature taille M, frites, boisson', 1690, 'Menus Tacos Signature'),
+    (9, 'Menu Tacos Signature L', 'Recette signature taille L, frites, boisson', 1990, 'Menus Tacos Signature'),
+
+    -- Menus Bol
+    (10, 'Menu Bol Classique', 'Bol avec base + protéines + sauce + boisson', 1450, 'Menus Bol'),
+    (11, 'Menu Bol Gourmand', 'Bol gourmand avec topping croustillants + boisson', 1590, 'Menus Bol'),
+
+    -- Menus Wrap
+    (12, 'Menu Wrap Classique', 'Wrap, frites, boisson 33cl', 1390, 'Menus Wrap'),
+    (13, 'Menu Wrap Épicé', 'Wrap épicé, frites, boisson 33cl', 1450, 'Menus Wrap'),
+
+    -- Menu Enfant
+    (14, 'Menu Enfant', 'Mini tacos ou nuggets, petites frites, boisson, dessert', 990, 'Menus Enfant'),
+
+    -- Tacos à composer (sans menu)
+    (15, 'Tacos Sur-Mesure Simple', '1 viande, sauce au choix, sauce fromagère', 720, 'Tacos à composer'),
+    (16, 'Tacos Sur-Mesure Double', '2 viandes, sauces au choix, sauce fromagère', 940, 'Tacos à composer'),
+    (17, 'Tacos Sur-Mesure Maxi', '3 viandes, double galette, sauces au choix', 1320, 'Tacos à composer'),
+
+    -- Sides
+    (18, 'Portion de frites', 'Frites classiques', 250, 'Sides'),
+    (19, 'Maxi frites', 'Grande portion de frites', 350, 'Sides'),
+    (20, 'Onion Rings (6 pcs)', 'Rondelles d''oignon croustillantes', 390, 'Sides'),
+    (21, 'Nuggets (6 pcs)', 'Blanc de poulet pané', 450, 'Sides'),
+
+    -- Desserts
+    (22, 'Cookie chocolat', 'Cookie fondant aux pépites de chocolat', 290, 'Desserts'),
+    (23, 'Brownie', 'Brownie chocolat', 320, 'Desserts'),
+    (24, 'Glace individuelle', 'Pot de glace individuel', 350, 'Desserts'),
+
+    -- Boissons
+    (25, 'Boisson 33cl', 'Soda 33cl au choix', 250, 'Boissons'),
+    (26, 'Boisson 50cl', 'Soda 50cl au choix', 320, 'Boissons'),
+    (27, 'Eau 50cl', 'Bouteille d''eau', 200, 'Boissons')
   `);
 });
 

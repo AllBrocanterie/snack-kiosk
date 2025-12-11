@@ -1,3 +1,36 @@
+// ==== CONFIG TACOS SUR-MESURE ====
+
+// Viandes proposées
+const TACOS_MEATS = [
+  { id: 'poulet', label: 'Poulet mariné' },
+  { id: 'tenders', label: 'Tenders' },
+  { id: 'steak', label: 'Steak haché' },
+  { id: 'merguez', label: 'Merguez' },
+  { id: 'cordon', label: 'Cordon bleu' }
+];
+
+// Sauces proposées
+const TACOS_SAUCES = [
+  { id: 'alg', label: 'Algérienne' },
+  { id: 'blanche', label: 'Blanche' },
+  { id: 'bbq', label: 'Barbecue' },
+  { id: 'samourai', label: 'Samouraï' },
+  { id: 'ketchup', label: 'Ketchup' },
+  { id: 'mayo', label: 'Mayonnaise' }
+];
+
+// Suppléments payants
+const TACOS_EXTRAS = [
+  { id: 'cheddar', label: 'Cheddar', price_cents: 50 },
+  { id: 'raclette', label: 'Raclette', price_cents: 70 },
+  { id: 'lardons', label: 'Lardons', price_cents: 70 },
+  { id: 'jalapenos', label: 'Jalapeños', price_cents: 50 }
+];
+
+// État du configurateur
+let composerBaseItem = null;
+let composerMaxMeats = 1;
+
 // ==== ÉTAT GLOBAL ====
 let currentUserId = null;
 let cart = [];
@@ -10,6 +43,7 @@ const screens = {
   products: document.getElementById('screen-products'),
   cart: document.getElementById('screen-cart'),
   auth: document.getElementById('screen-auth'),
+  composer: document.getElementById('screen-composer'),
   confirmation: document.getElementById('screen-confirmation'),
 };
 
@@ -96,15 +130,220 @@ async function loadProducts(category) {
     div.className = 'card';
     div.innerHTML = `
       <h3>${item.name}</h3>
-      <p>${(item.price_cents / 100).toFixed(2)} €</p>
-      <button class="btn-secondary">Ajouter</button>
-    `;
-    div.querySelector('button').addEventListener('click', () => {
+    <p>${(item.price_cents / 100).toFixed(2)} €</p>
+    <button class="btn-secondary">Ajouter</button>
+  `;
+  div.querySelector('button').addEventListener('click', () => {
+    if (item.category === 'Tacos à composer') {
+      openComposer(item);
+    } else {
       addToCart(item);
-    });
-    container.appendChild(div);
+    }
   });
+  container.appendChild(div);
+});
 }
+
+// ==== CONFIGURATEUR DE TACOS SUR-MESURE ====
+
+// Ouvre l'écran de composition pour un tacos sur-mesure
+function openComposer(baseItem) {
+  composerBaseItem = baseItem;
+
+  // Détermine le nombre max de viandes selon le nom
+  const name = baseItem.name.toLowerCase();
+  if (name.includes('maxi')) {
+    composerMaxMeats = 3;
+  } else if (name.includes('double')) {
+    composerMaxMeats = 2;
+  } else {
+    composerMaxMeats = 1;
+  }
+
+  document.getElementById('composer-base-name').textContent = baseItem.name;
+  document.getElementById('composer-base-price').textContent =
+    'Base : ' + (baseItem.price_cents / 100).toFixed(2) + ' €';
+
+  document.getElementById('composer-meats-help').textContent =
+    `Choisis jusqu'à ${composerMaxMeats} viande(s).`;
+
+  renderComposerOptions();
+  updateComposerTotal();
+
+  showScreen('composer', 'Composition du tacos');
+}
+
+// Affiche les options viandes / sauces / extras
+function renderComposerOptions() {
+  const meatsContainer = document.getElementById('composer-meats');
+  const saucesContainer = document.getElementById('composer-sauces');
+  const extrasContainer = document.getElementById('composer-extras');
+
+  meatsContainer.innerHTML = '';
+  saucesContainer.innerHTML = '';
+  extrasContainer.innerHTML = '';
+
+  // Viandes (checkbox + limite)
+  TACOS_MEATS.forEach(meat => {
+    const label = document.createElement('label');
+    label.className = 'composer-chip';
+    label.innerHTML = `
+      <input type="checkbox" value="${meat.id}" data-type="meat" />
+      <span>${meat.label}</span>
+    `;
+    meatsContainer.appendChild(label);
+  });
+
+  // Sauces (checkbox, on conseille 1 ou 2 max)
+  TACOS_SAUCES.forEach(sauce => {
+    const label = document.createElement('label');
+    label.className = 'composer-chip';
+    label.innerHTML = `
+      <input type="checkbox" value="${sauce.id}" data-type="sauce" />
+      <span>${sauce.label}</span>
+    `;
+    saucesContainer.appendChild(label);
+  });
+
+  // Suppléments (checkbox + prix)
+  TACOS_EXTRAS.forEach(extra => {
+    const label = document.createElement('label');
+    label.className = 'composer-chip';
+    label.innerHTML = `
+      <input type="checkbox" value="${extra.id}" data-type="extra" />
+      <span>${extra.label} (+${(extra.price_cents / 100).toFixed(2)}€)</span>
+    `;
+    extrasContainer.appendChild(label);
+  });
+
+  // Gestion des limites et recalcul du total
+  document
+    .querySelectorAll('#screen-composer input[type="checkbox"]')
+    .forEach(input => {
+      input.addEventListener('change', onComposerChange);
+    });
+}
+
+// Gère les changements dans le configurateur (viandes/sauces/extras)
+function onComposerChange(e) {
+  const input = e.target;
+  const type = input.dataset.type;
+
+  if (type === 'meat') {
+    const checkedMeats = Array.from(
+      document.querySelectorAll('#composer-meats input[type="checkbox"]:checked')
+    );
+    if (checkedMeats.length > composerMaxMeats) {
+      // On empêche de dépasser la limite
+      input.checked = false;
+      alert(`Tu peux choisir au maximum ${composerMaxMeats} viande(s) pour ce tacos.`);
+      return;
+    }
+  }
+
+  // On ne bloque pas les sauces, mais on pourrait limiter à 2 si tu veux
+  updateComposerTotal();
+}
+
+// Recalcule le total du tacos en fonction des suppléments
+function updateComposerTotal() {
+  if (!composerBaseItem) return;
+
+  let total = composerBaseItem.price_cents;
+
+  const extrasChecked = Array.from(
+    document.querySelectorAll('#composer-extras input[type="checkbox"]:checked')
+  ).map(i => i.value);
+
+  extrasChecked.forEach(id => {
+    const extra = TACOS_EXTRAS.find(e => e.id === id);
+    if (extra) {
+      total += extra.price_cents;
+    }
+  });
+
+  document.getElementById('composer-total').textContent =
+    (total / 100).toFixed(2) + ' €';
+}
+
+// Ajoute le tacos composé au panier
+function addComposedTacosToCart() {
+  if (!composerBaseItem) return;
+
+  const meatsSelected = Array.from(
+    document.querySelectorAll('#composer-meats input[type="checkbox"]:checked')
+  ).map(i => i.value);
+
+  if (meatsSelected.length === 0) {
+    alert('Choisis au moins 1 viande.');
+    return;
+  }
+
+  const saucesSelected = Array.from(
+    document.querySelectorAll('#composer-sauces input[type="checkbox"]:checked')
+  ).map(i => i.value);
+
+  if (saucesSelected.length === 0) {
+    alert('Choisis au moins 1 sauce.');
+    return;
+  }
+
+  const extrasSelected = Array.from(
+    document.querySelectorAll('#composer-extras input[type="checkbox"]:checked')
+  ).map(i => i.value);
+
+  // Construire un label lisible pour le panier
+  const meatLabels = meatsSelected
+    .map(id => TACOS_MEATS.find(m => m.id === id)?.label || id)
+    .join(', ');
+  const sauceLabels = saucesSelected
+    .map(id => TACOS_SAUCES.find(s => s.id === id)?.label || id)
+    .join(', ');
+  const extraLabels = extrasSelected
+    .map(id => TACOS_EXTRAS.find(ex => ex.id === id)?.label || id)
+    .join(', ');
+
+  const parts = [];
+  parts.push('Viandes : ' + meatLabels);
+  parts.push('Sauces : ' + sauceLabels);
+  if (extrasSelected.length > 0) {
+    parts.push('Supp : ' + extraLabels);
+  }
+
+  const details = parts.join(' | ');
+
+  // Recalcul du prix final
+  let finalPrice = composerBaseItem.price_cents;
+  extrasSelected.forEach(id => {
+    const extra = TACOS_EXTRAS.find(e => e.id === id);
+    if (extra) {
+      finalPrice += extra.price_cents;
+    }
+  });
+
+  // On crée un item spécifique (sans fusion avec les autres)
+  const cartItem = {
+    id: composerBaseItem.id, // identifiant du produit de base
+    name: composerBaseItem.name + ' (' + details + ')',
+    price_cents: finalPrice,
+    quantity: 1
+  };
+
+  // On ajoute directement sans fusionner
+  cart.push(cartItem);
+  renderCart();
+
+  showScreen('cart', 'Étape 4/4 : Panier & créneau');
+}
+
+// Boutons du configurateur
+document.getElementById('btn-composer-cancel').addEventListener('click', () => {
+  showScreen('products', 'Étape 3/4 : Produits');
+});
+
+document.getElementById('btn-composer-add').addEventListener('click', () => {
+  addComposedTacosToCart();
+});
 
 // ==== PANIER ====
 function addToCart(item) {
