@@ -8,7 +8,7 @@ const twilio = require('twilio');
 
 // ==== 2. CONFIG DE BASE EXPRESS ====
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Pour lire le JSON dans les requêtes
 app.use(express.json());
@@ -462,6 +462,9 @@ app.post('/api/admin/orders/:id/status', adminAuth, (req, res) => {
       res.json({ message: 'Statut mis à jour' });
     }
   );
+});
+app.get('/healthz', (req, res) => {
+  res.send('OK');
 });
 // ==== 13. LANCER LE SERVEUR ====
 app.listen(PORT, () => {
