@@ -5,6 +5,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
 const twilio = require('twilio');
+const axios = require('axios');
 
 // ==== 2. CONFIG DE BASE EXPRESS ====
 const app = express();
@@ -387,8 +388,39 @@ app.post('/api/orders', (req, res) => {
 
           stmt.finalize();
 
-          // Ici tu pourrais appeler le système de gestion existant (POS)
-          // pour lui envoyer la commande (via API, fichier, etc.)
+          // Envoi optionnel vers le logiciel de caisse (POS)
+          if (process.env.POS_API_URL && process.env.POS_API_KEY) {
+            console.log('Tentative d\'envoi de la commande au POS...', {
+              url: process.env.POS_API_URL + '/orders'
+            });
+
+            axios.post(
+              process.env.POS_API_URL + '/orders',
+              {
+                orderId: orderId,
+                userId: userId,
+                totalCents: totalCents,
+                slotTime: slotTime,
+                items: items
+              },
+              {
+                headers: {
+                  'Authorization': 'Bearer ' + process.env.POS_API_KEY,
+                  'Content-Type': 'application/json'
+                }
+              }
+            ).then((response) => {
+              console.log('✔ Commande envoyée au POS. Status:', response.status);
+            }).catch(err => {
+              if (err.response) {
+                console.error('❌ Erreur POS (réponse):', err.response.status, err.response.data);
+              } else {
+                console.error('❌ Erreur POS (pas de réponse):', err.message);
+              }
+            });
+          } else {
+            console.log('POS non configuré, commande non envoyée au logiciel externe');
+          }
 
           res.json({ message: 'Commande créée', orderId });
         }
